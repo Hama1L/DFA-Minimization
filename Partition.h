@@ -1,35 +1,14 @@
-#include <vector>
-#include <iostream>
-using namespace std;
+#include "helpers.h"
 
-void print_vector(vector<int> &row)
-{
-    for (auto input : row)
-        cout << input << ' ';
-    cout << endl;
-}
-
-void print_table(vector<vector<int>> &table)
-{
-    for (auto row : table)
-        print_vector(row);
-    cout << endl;
-}
-
-bool compare_vectors(vector<int> vec1, vector<int> vec2)
-{
-    for (int i = 0; i < vec1.size(); i++)
-        if (vec1[i] != vec2[i])
-            return false;
-    return true;
-}
+#ifndef PART
+#define PART
 
 class Partition
 {
     int inputs;
-    vector<int> final;
-    vector<vector<int>> table;
-    bool done = false;
+    vector<int> final_states;
+    vector<vector<int>> transition_table;
+    bool is_done = false;
 
     void map_table(vector<vector<int>> &old_table, vector<vector<int>> &new_table)
     {
@@ -47,16 +26,16 @@ class Partition
             {
                 vector<int> reference = new_table[i];
                 for (int j = i; j < new_table.size(); j++)
-                    if (compare_vectors(reference, new_table[j]))
+                    if (reference == new_table[j])
                         new_table[j][inputs + 1] = counter;
                 counter++;
             }
         }
 
-        done = true;
+        is_done = true;
         for (int i = 0; i < new_table.size(); i++)
             if (old_table[i][inputs] != new_table[i][inputs + 1])
-                done = false;
+                is_done = false;
 
         for (int i = 0; i < new_table.size(); i++)
             old_table[i][inputs] = new_table[i][inputs + 1];
@@ -64,51 +43,46 @@ class Partition
 
     void reduce_table(vector<vector<int>> &mappings)
     {
-
         for (int i = 0; i < mappings.size(); i++)
-            mappings[i][inputs + 1] = final[i];
+            mappings[i][inputs + 1] = final_states[i];
 
         vector<vector<int>> minimized;
         for (int i = 0; i < mappings.size(); i++)
         {
-            bool unique = true;
-            for (int j = i + 1; j < mappings.size(); j++)
-                if (compare_vectors(mappings[i], mappings[j]))
-                    unique = false;
-
-            if (unique)
+            if (!vectorExists(minimized, mappings[i]))
                 minimized.push_back(mappings[i]);
         }
 
-        table.clear();
-        final.clear();
+        transition_table.clear();
+        final_states.clear();
 
         for (int i = 0; i < minimized.size(); i++)
         {
-            vector<int> row = {minimized[i][0],
-                               minimized[i][1]};
-            table.push_back(row);
-            final.push_back(minimized[i][3]);
+            vector<int> row;
+            for (int j = 0; j < inputs; j++)
+                row.push_back(minimized[i][j]);
+            transition_table.push_back(row);
+            final_states.push_back(minimized[i][inputs + 1]);
         }
     }
 
 public:
     Partition(int inputs, vector<int> final, vector<vector<int>> table)
-        : inputs(inputs), final(final), table(table) {}
+        : inputs(inputs), final_states(final), transition_table(table) {}
 
     void minimize()
     {
-        vector<vector<int>> old_table(table.size(), vector<int>(inputs + 2));
+        vector<vector<int>> old_table(transition_table.size(), vector<int>(inputs + 2));
 
-        for (int i = 0; i < table.size(); i++)
+        for (int i = 0; i < transition_table.size(); i++)
         {
             for (int j = 0; j < inputs; j++)
-                old_table[i][j] = table[i][j];
-            old_table[i][inputs] = final[i];
+                old_table[i][j] = transition_table[i][j];
+            old_table[i][inputs] = final_states[i];
             old_table[i][inputs + 1] = -1;
         }
 
-        while (!done)
+        while (!is_done)
         {
             vector<vector<int>> new_table = old_table;
             map_table(old_table, new_table);
@@ -122,28 +96,9 @@ public:
 
     void printTable()
     {
-        print_table(table);
-        print_vector(final);
+        print_table(transition_table);
+        print_vector(final_states);
     }
 };
 
-int main()
-{
-    int inputs = 2;
-
-    vector<vector<int>> table = {
-
-        {1, 2},
-        {0, 3},
-        {4, 5},
-        {4, 5},
-        {4, 5},
-        {5, 5},
-    };
-
-    vector<int> final = {0, 1, 1, 1, 0, 0};
-
-    auto algo = Partition(inputs, final, table);
-    algo.minimize();
-    algo.printTable();
-}
+#endif
