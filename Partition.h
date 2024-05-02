@@ -89,6 +89,8 @@ public:
             update_table(old_table, new_table);
         }
 
+        print_table(old_table);
+
         vector<vector<int>> mappings = old_table;
         map_table(old_table, mappings);
         reduce_table(mappings);
