@@ -5,7 +5,7 @@ using namespace std;
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 using namespace sf;
-#include "Visualizer.h"
+
 #ifndef MENU
 #define MENU
 

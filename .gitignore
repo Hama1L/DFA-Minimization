@@ -31,4 +31,9 @@
 *.out
 *.app
 
+# VS Code
 .vscode
+
+# SFML
+run/
+src/
