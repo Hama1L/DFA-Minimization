@@ -1,9 +1,5 @@
-#include <vector>
-#include <iostream>
-using namespace std;
-
+#include "viz.h"
 #include <SFML/Audio.hpp>
-#include <SFML/Graphics.hpp>
 using namespace sf;
 
 #ifndef MENU
@@ -21,7 +17,7 @@ struct Menu
     Sprite background;
 
     Text selectedOption;
-    bool multiThreadedSelected = false;
+    bool Partitionselected = true;
 
     Menu()
     {
@@ -58,31 +54,32 @@ struct Menu
                     window->close();
                 else if (event.type == sf::Event::MouseButtonPressed)
                 {
-                    sf::FloatRect multiThreadedBounds = Partition.getGlobalBounds();
+                    sf::FloatRect PartitionBounds = Partition.getGlobalBounds();
                     FloatRect MyhillNerodeBounds = MyhillNerodeText.getGlobalBounds();
 
-                    if (multiThreadedBounds.contains(event.mouseButton.x, event.mouseButton.y))
+                    if (PartitionBounds.contains(event.mouseButton.x, event.mouseButton.y))
                     {
                         partitionSelected = true;
                         selectedOption = Partition;
-                        Visualizer viz;
-                        viz.setup(); // mutithreaded
-                        viz.run();
+                        Viz viz(window);
+                        viz.draw(true);
+                        window->close();
                     }
                     else if (MyhillNerodeBounds.contains(event.mouseButton.x, event.mouseButton.y))
                     {
-                        multiThreadedSelected = false;
+                        Partitionselected = false;
                         selectedOption = MyhillNerodeText;
-                        Visualizer viz;
-                        viz.run(); // single threaded
+                        Viz viz(window);
+                        viz.draw(false);
+                        
                     }
                 }
                 else if (event.type == sf::Event::MouseMoved)
                 {
-                    sf::FloatRect multiThreadedBounds = Partition.getGlobalBounds();
+                    sf::FloatRect PartitionBounds = Partition.getGlobalBounds();
                     sf::FloatRect MyhillNerodeBounds = MyhillNerodeText.getGlobalBounds();
 
-                    if (multiThreadedBounds.contains(event.mouseMove.x, event.mouseMove.y))
+                    if (PartitionBounds.contains(event.mouseMove.x, event.mouseMove.y))
                     {
                         Partition.setFillColor(sf::Color::Yellow);
                         window->draw(Partition);

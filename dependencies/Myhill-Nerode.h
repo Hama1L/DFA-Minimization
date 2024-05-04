@@ -3,7 +3,7 @@
 #ifndef HILL
 #define HILL
 
-class MyhillNerode
+struct MyhillNerode
 {
     int inputs;
     vector<int> final;

@@ -13,19 +13,23 @@ struct Viz
     Text afterText;
     vector<vector<int>> initial_transition_table;
     vector<vector<int>> final_transition_table;
+    MyhillNerode *m1;
+    MyhillNerode *m2;
 
-    Viz() :  font(), beforeText(), afterText(), initial_transition_table(), final_transition_table()
-    {
-        window = new RenderWindow(sf::VideoMode(1600, 900), "Visualizer");
+
+    Viz(RenderWindow *win) :  font(), beforeText(), afterText(), initial_transition_table(), final_transition_table()
+    {   window=win;
+        // window = new RenderWindow(sf::VideoMode(1600, 900), "Visualizer");
         Partition machine(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
         Partition machine1(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
-        machine1.minimize();
+        m1=new MyhillNerode(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
+        m2= new MyhillNerode(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
 
-       
         initial_transition_table = machine.transition_table;
+        machine1.minimize();
         final_transition_table = machine1.transition_table;
 
-        
+        m2->minimize();
         font.loadFromFile("assets/fonts/font2.ttf");
 
      
@@ -37,15 +41,28 @@ struct Viz
 
       
         afterText.setFont(font);
-        afterText.setString("After Minimization:");
+        afterText.setString("After Minimization");
         afterText.setCharacterSize(24);
-        afterText.setFillColor(Color::Green);
+        afterText.setFillColor(Color::Yellow);
         afterText.setPosition(20, 250);
     }
 
     void draw(bool selec)
     {
+       
         if(selec){
+        run();
+    }
+    else{
+        // afterText.setString("After minimization (Using Myhill Nerode)");
+        initial_transition_table=m1->table;
+        final_transition_table=m2->table;
+        run();
+
+    }
+    }
+    void run()
+    {
         while (window->isOpen())
         {
             Event event;
@@ -55,13 +72,10 @@ struct Viz
                     window->close();
             }
 
-            
             window->clear();
 
-        
             window->draw(beforeText);
 
-        
             for (int i = 0; i < initial_transition_table.size(); i++)
             {
                 for (int j = 0; j < initial_transition_table[i].size(); j++)
@@ -72,10 +86,8 @@ struct Viz
                 }
             }
 
-            
             window->draw(afterText);
 
-            
             for (int i = 0; i < final_transition_table.size(); i++)
             {
                 for (int j = 0; j < final_transition_table[i].size(); j++)
@@ -86,12 +98,7 @@ struct Viz
                 }
             }
 
-            
             window->display();
         }
-    }
-    else{
-
-    }
     }
 };

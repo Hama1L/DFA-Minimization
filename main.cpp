@@ -1,4 +1,4 @@
-#include "dependencies/viz.h"
+#include "dependencies/Menu.h"
 
 
 using namespace sf;
@@ -6,8 +6,8 @@ using namespace std;
 
 int main()
 {
-   Viz viz;
-   viz.draw(true);
+   Menu men;
+   men.draw();
 
     return 0;
 }

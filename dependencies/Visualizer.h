@@ -5,7 +5,7 @@ using namespace std;
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
-class Node
+class Visualizer
 {
 public:
     int id;
@@ -15,7 +15,7 @@ public:
     CircleShape shape;
     Text text;
 
-    Node(int id, int x, int y, string label) : id(id), x(x), y(y), label(label)
+    Visualizer(int id, int x, int y, string label) : id(id), x(x), y(y), label(label)
     {
         shape.setRadius(20);
         shape.setFillColor(sf::Color::White);
@@ -32,10 +32,10 @@ public:
 class Transition
 {
 public:
-    Node *from;
-    Node *to;
+    Visualizer *from;
+    Visualizer *to;
 
-    Transition(Node *from, Node *to) : from(from), to(to)
+    Transition(Visualizer *from, Visualizer *to) : from(from), to(to)
     {
     }
 };
