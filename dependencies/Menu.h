@@ -7,61 +7,61 @@ using namespace sf;
 
 struct Menu
 {
-    RectangleShape menu;
     RenderWindow *window;
 
-    Texture image;
-    Music music;
-
-    Font font;
+    Texture background_image;
     Sprite background;
+
+    Music music;
+    Font font;
 
     Text selectedOption;
     bool Partitionselected = true;
 
     Menu()
     {
-        image.loadFromFile("assets/images/back.jpg");
-        background.setTexture(image);
+        background_image.loadFromFile("assets/images/back.jpg");
+        background.setTexture(background_image);
+
         font.loadFromFile("assets/fonts/font2.ttf");
-        window = new RenderWindow(sf::VideoMode(1600, 900), "Menu");
+        window = new RenderWindow(VideoMode(1600, 900), "Menu");
         music.openFromFile("assets/sounds/gottrim.wav");
     }
 
     void draw()
     {
-        music.setLoop(true);
-        music.play();
-        music.setPitch(1.3);
+        // music.setLoop(true);
+        // music.play();
+        // music.setPitch(1.3);
 
-        sf::Text Partition("Partition", font, 60);
+        Text Partition("Partition", font, 60);
         Partition.setPosition(350, 200);
-        Partition.setFillColor(sf::Color::White);
+        Partition.setFillColor(Color::White);
 
         Text MyhillNerodeText("Myhill-Nerode", font, 60);
         MyhillNerodeText.setPosition(350, 350);
-        MyhillNerodeText.setFillColor(sf::Color::White);
+        MyhillNerodeText.setFillColor(Color::White);
 
         Text selectedOption;
         bool partitionSelected = false;
         while (window->isOpen())
         {
 
-            sf::Event event;
+            Event event;
             while (window->pollEvent(event))
             {
-                if (event.type == sf::Event::Closed)
+                if (event.type == Event::Closed)
                     window->close();
-                else if (event.type == sf::Event::MouseButtonPressed)
+                else if (event.type == Event::MouseButtonPressed)
                 {
-                    sf::FloatRect PartitionBounds = Partition.getGlobalBounds();
+                    FloatRect PartitionBounds = Partition.getGlobalBounds();
                     FloatRect MyhillNerodeBounds = MyhillNerodeText.getGlobalBounds();
 
                     if (PartitionBounds.contains(event.mouseButton.x, event.mouseButton.y))
                     {
                         partitionSelected = true;
                         selectedOption = Partition;
-                        Viz viz(window);
+                        Viz viz(window, background);
                         viz.draw(true);
                         window->close();
                     }
@@ -69,30 +69,30 @@ struct Menu
                     {
                         Partitionselected = false;
                         selectedOption = MyhillNerodeText;
-                        Viz viz(window);
+                        Viz viz(window, background);
                         viz.draw(false);
-                        
+                        window->close();
                     }
                 }
-                else if (event.type == sf::Event::MouseMoved)
+                else if (event.type == Event::MouseMoved)
                 {
-                    sf::FloatRect PartitionBounds = Partition.getGlobalBounds();
-                    sf::FloatRect MyhillNerodeBounds = MyhillNerodeText.getGlobalBounds();
+                    FloatRect PartitionBounds = Partition.getGlobalBounds();
+                    FloatRect MyhillNerodeBounds = MyhillNerodeText.getGlobalBounds();
 
                     if (PartitionBounds.contains(event.mouseMove.x, event.mouseMove.y))
                     {
-                        Partition.setFillColor(sf::Color::Yellow);
+                        Partition.setFillColor(Color::Yellow);
                         window->draw(Partition);
                     }
                     else if (MyhillNerodeBounds.contains(event.mouseMove.x, event.mouseMove.y))
                     {
-                        MyhillNerodeText.setFillColor(sf::Color::Yellow);
+                        MyhillNerodeText.setFillColor(Color::Yellow);
                         window->draw(MyhillNerodeText);
                     }
                     else
                     {
-                        Partition.setFillColor(sf::Color::White);
-                        MyhillNerodeText.setFillColor(sf::Color::White);
+                        Partition.setFillColor(Color::White);
+                        MyhillNerodeText.setFillColor(Color::White);
                         window->draw(Partition);
                         window->draw(MyhillNerodeText);
                     }

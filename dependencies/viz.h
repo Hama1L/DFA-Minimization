@@ -1,5 +1,5 @@
-#include "Myhill-Nerode.h"
 #include "Partition.h"
+#include "Myhill-Nerode.h"
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -7,98 +7,111 @@ using namespace std;
 
 struct Viz
 {
-    RenderWindow *window;
     Font font;
-    Text beforeText;
     Text afterText;
+    Text beforeText;
+    Text betweenText;
+    Sprite background;
+    RenderWindow *window;
+
+    vector<vector<vector<int>>> intermediate_transition_tables;
     vector<vector<int>> initial_transition_table;
     vector<vector<int>> final_transition_table;
-    MyhillNerode *m1;
+
+    Partition *m1;
     MyhillNerode *m2;
 
+    Viz(RenderWindow *win, Sprite background) : window(win), background(background)
+    {
+        m1 = new Partition(
+            2, {0, 1, 1, 0, 1, 0},
+            {
+                {3, 1},
+                {2, 5},
+                {2, 5},
+                {0, 4},
+                {2, 5},
+                {5, 5},
+            });
 
-    Viz(RenderWindow *win) :  font(), beforeText(), afterText(), initial_transition_table(), final_transition_table()
-    {   window=win;
-        // window = new RenderWindow(sf::VideoMode(1600, 900), "Visualizer");
-        Partition machine(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
-        Partition machine1(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
-        m1=new MyhillNerode(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
-        m2= new MyhillNerode(2, {1, 0, 1}, {{0, 1, 0}, {1, 0, 1}, {0, 1, 0}});
-
-        initial_transition_table = machine.transition_table;
-        machine1.minimize();
-        final_transition_table = machine1.transition_table;
-
-        m2->minimize();
         font.loadFromFile("assets/fonts/font2.ttf");
 
-     
         beforeText.setFont(font);
         beforeText.setString("Before Minimization:");
-        beforeText.setCharacterSize(24);
+        beforeText.setCharacterSize(48);
         beforeText.setFillColor(Color::Yellow);
         beforeText.setPosition(20, 20);
 
-      
+        betweenText.setFont(font);
+        betweenText.setString("During Minimization:");
+        betweenText.setCharacterSize(48);
+        betweenText.setFillColor(Color::Yellow);
+        betweenText.setPosition(20, 270);
+
         afterText.setFont(font);
         afterText.setString("After Minimization");
-        afterText.setCharacterSize(24);
+        afterText.setCharacterSize(48);
         afterText.setFillColor(Color::Yellow);
-        afterText.setPosition(20, 250);
+        afterText.setPosition(20, 520);
     }
 
-    void draw(bool selec)
+    void draw(bool part)
     {
-       
-        if(selec){
-        run();
-    }
-    else{
-        // afterText.setString("After minimization (Using Myhill Nerode)");
-        initial_transition_table=m1->table;
-        final_transition_table=m2->table;
-        run();
+        initial_transition_table = m1->transition_table;
+        m1->minimize();
+        final_transition_table = m1->transition_table;
+        intermediate_transition_tables = m1->intermediate_transition_tables;
 
+        run();
     }
-    }
+
     void run()
     {
         while (window->isOpen())
         {
             Event event;
             while (window->pollEvent(event))
-            {
                 if (event.type == Event::Closed)
                     window->close();
-            }
 
             window->clear();
 
+            window->draw(background);
+
             window->draw(beforeText);
 
-            for (int i = 0; i < initial_transition_table.size(); i++)
-            {
-                for (int j = 0; j < initial_transition_table[i].size(); j++)
-                {
-                    Text tableEntry(to_string(initial_transition_table[i][j]), font, 18);
-                    tableEntry.setPosition(50 + j * 20, 50 + i * 20);
-                    window->draw(tableEntry);
-                }
-            }
+            draw_table(50, 100, initial_transition_table);
+
+            window->draw(betweenText);
+
+            for (int i = 0; i < intermediate_transition_tables.size(); i++)
+                draw_table(50 + i * 200, 350, intermediate_transition_tables[i]);
 
             window->draw(afterText);
 
-            for (int i = 0; i < final_transition_table.size(); i++)
-            {
-                for (int j = 0; j < final_transition_table[i].size(); j++)
-                {
-                    Text tableEntry(to_string(final_transition_table[i][j]), font, 18);
-                    tableEntry.setPosition(50 + j * 20, 280 + i * 20);
-                    window->draw(tableEntry);
-                }
-            }
+            draw_table(50, 600, final_transition_table);
 
             window->display();
+        }
+    }
+
+    void draw_table(int x, int y, vector<vector<int>> &table)
+    {
+        for (int i = 0; i < table.size(); i++)
+        {
+            for (int j = 0; j < table[i].size(); j++)
+            {
+                Text tableEntry(to_string(table[i][j]), font, 24);
+                tableEntry.setPosition(50 + j * 30, 280 + i * 30);
+                tableEntry.setPosition(x + j * 30, y + i * 30);
+
+                if (j >= 2)
+                    tableEntry.setColor(Color::Blue);
+                else
+                    tableEntry.setColor(Color::White);
+
+                window->draw(tableEntry);
+            }
         }
     }
 };

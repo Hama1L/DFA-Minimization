@@ -8,6 +8,7 @@ struct Partition
     int inputs;
     vector<int> final_states;
     vector<vector<int>> transition_table;
+    vector<vector<vector<int>>> intermediate_transition_tables;
     bool is_done = false;
 
     void map_table(vector<vector<int>> &old_table, vector<vector<int>> &new_table)
@@ -61,14 +62,18 @@ struct Partition
             vector<int> row;
             for (int j = 0; j < inputs; j++)
                 row.push_back(minimized[i][j]);
+            row.push_back(minimized[i][inputs + 1]);
             transition_table.push_back(row);
-            final_states.push_back(minimized[i][inputs + 1]);
         }
     }
 
 public:
     Partition(int inputs, vector<int> final, vector<vector<int>> table)
-        : inputs(inputs), final_states(final), transition_table(table) {}
+        : inputs(inputs), final_states(final), transition_table(table)
+    {
+        for (int i = 0; i < transition_table.size(); i++)
+            transition_table[i].push_back(final_states[i]);
+    }
 
     void minimize()
     {
@@ -87,9 +92,8 @@ public:
             vector<vector<int>> new_table = old_table;
             map_table(old_table, new_table);
             update_table(old_table, new_table);
+            intermediate_transition_tables.push_back(new_table);
         }
-
-      //  print_table(old_table);
 
         vector<vector<int>> mappings = old_table;
         map_table(old_table, mappings);
@@ -99,7 +103,6 @@ public:
     void printTable()
     {
         print_table(transition_table);
-        print_vector(final_states);
     }
 };
 
