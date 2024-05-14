@@ -23,6 +23,8 @@ struct Viz
     Partition *m1;
     MyhillNerode *m2;
 
+    bool myh;
+
     Viz(RenderWindow *win, Sprite background) : window(win), background(background)
     {
         m1 = new Partition(
@@ -35,9 +37,19 @@ struct Viz
                 {2, 5},
                 {5, 5},
             });
+        m2 = new MyhillNerode(
+            2, {0, 1, 1, 0, 1, 0},
+            {
+                {3, 1},
+                {2, 5},
+                {2, 5},
+                {0, 4},
+                {2, 5},
+                {5, 5},
+            });
 
         font.loadFromFile("assets/fonts/font2.ttf");
-
+        
         beforeText.setFont(font);
         beforeText.setString("Before Minimization:");
         beforeText.setCharacterSize(48);
@@ -55,66 +67,77 @@ struct Viz
         afterText.setCharacterSize(48);
         afterText.setFillColor(Color::Yellow);
         afterText.setPosition(20, 520);
+
+        myh = false;
     }
 
     void draw(bool part)
     {
+        if(part){
         initial_transition_table = m1->transition_table;
         m1->minimize();
         final_transition_table = m1->transition_table;
         intermediate_transition_tables = m1->intermediate_transition_tables;
-
+        }
+        else
+        {
+            initial_transition_table=m2->table;
+            m2->minimize();
+            final_transition_table=m2->table;
+            myh=true;
+        }
         run();
     }
 
     void run()
     {
         bool firstTime = true;
+        int tableIndex = 0;
+
         while (window->isOpen())
         {
-            Event event;
+            sf::Event event;
             while (window->pollEvent(event))
-                if (event.type == Event::Closed)
+            {
+                if (event.type == sf::Event::Closed)
+                {
                     window->close();
+                }
+                else if (event.type == sf::Event::MouseButtonPressed)
+                {
+                    tableIndex++;
+                }
+            }
 
             window->clear();
-
             window->draw(background);
 
             if (firstTime)
             {
                 window->display();
-                sleep(milliseconds(1000));
+                sf::sleep(sf::milliseconds(1000));
+                firstTime = false;
             }
-            window->draw(beforeText);
 
+            window->draw(beforeText);
             draw_table(50, 100, initial_transition_table);
 
-            if (firstTime)
+            if (tableIndex >= 1 && !myh)
             {
-                sleep(milliseconds(1000));
-                window->display();
+                window->draw(betweenText);
+                for (int i = 0; i < intermediate_transition_tables.size(); i++)
+                {
+                    draw_table(500 + i * 400, 350, intermediate_transition_tables[i]);
+                }
             }
-            window->draw(betweenText);
 
-            for (int i = 0; i < intermediate_transition_tables.size(); i++)
-                draw_table(500 + i * 400, 350, intermediate_transition_tables[i]);
-
-            if (firstTime)
+            if (tableIndex > 1)
             {
-                sleep(milliseconds(3000));
-                window->display();
+                window->draw(afterText);
+                draw_table(60, 600, final_transition_table);
             }
-            window->draw(afterText);
 
-            draw_table(60, 600, final_transition_table);
-            if (firstTime)
-            {
-                sleep(milliseconds(2000));
-                window->display();
-            }
             window->display();
-            firstTime = false;
         }
     }
 
