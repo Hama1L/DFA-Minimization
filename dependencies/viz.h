@@ -14,7 +14,7 @@ struct Viz
     Sprite background;
     RenderWindow *window;
     int cellWidth;
-     int cellHeight;
+    int cellHeight;
 
     vector<vector<vector<int>>> intermediate_transition_tables;
     vector<vector<int>> initial_transition_table;
@@ -22,8 +22,6 @@ struct Viz
 
     Partition *m1;
     MyhillNerode *m2;
-
-   
 
     Viz(RenderWindow *win, Sprite background) : window(win), background(background)
     {
@@ -40,7 +38,6 @@ struct Viz
 
         font.loadFromFile("assets/fonts/font2.ttf");
 
-        
         beforeText.setFont(font);
         beforeText.setString("Before Minimization:");
         beforeText.setCharacterSize(48);
@@ -58,8 +55,6 @@ struct Viz
         afterText.setCharacterSize(48);
         afterText.setFillColor(Color::Yellow);
         afterText.setPosition(20, 520);
-
-        
     }
 
     void draw(bool part)
@@ -93,7 +88,6 @@ struct Viz
             }
             window->draw(beforeText);
 
-
             draw_table(50, 100, initial_transition_table);
 
             if (firstTime)
@@ -102,7 +96,6 @@ struct Viz
                 window->display();
             }
             window->draw(betweenText);
-            
 
             for (int i = 0; i < intermediate_transition_tables.size(); i++)
                 draw_table(500 + i * 400, 350, intermediate_transition_tables[i]);
@@ -121,7 +114,7 @@ struct Viz
                 window->display();
             }
             window->display();
-            firstTime=false;
+            firstTime = false;
         }
     }
 
@@ -130,28 +123,26 @@ struct Viz
         RectangleShape rowBorder(Vector2f(table[0].size() * 50, 2));
         for (int i = 0; i <= table.size(); i++)
         {
-            
+
             rowBorder.setPosition(x, y + i * 50);
             rowBorder.setFillColor(Color::Black);
             window->draw(rowBorder);
         }
 
-       
+        RectangleShape colBorder(Vector2f(2, table.size() * 50));
         for (int j = 0; j <= table[0].size(); j++)
         {
-            RectangleShape colBorder(Vector2f(2, table.size() * 50));
             colBorder.setPosition(x + j * 50, y);
             colBorder.setFillColor(Color::Black);
             window->draw(colBorder);
         }
 
-        
         for (int i = 0; i < table.size(); i++)
         {
             for (int j = 0; j < table[i].size(); j++)
             {
                 Text tableEntry(to_string(table[i][j]), font, 24);
-                tableEntry.setPosition(x + j * 50 + 5, y + i * 50 + 5);
+                tableEntry.setPosition(x + 15 + j * 50, y + 15 + i * 50);
 
                 if (j >= 2)
                     tableEntry.setColor(Color::Blue);
