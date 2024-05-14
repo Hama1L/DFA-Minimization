@@ -13,6 +13,8 @@ struct Viz
     Text betweenText;
     Sprite background;
     RenderWindow *window;
+    int cellWidth;
+     int cellHeight;
 
     vector<vector<vector<int>>> intermediate_transition_tables;
     vector<vector<int>> initial_transition_table;
@@ -20,6 +22,8 @@ struct Viz
 
     Partition *m1;
     MyhillNerode *m2;
+
+   
 
     Viz(RenderWindow *win, Sprite background) : window(win), background(background)
     {
@@ -36,6 +40,7 @@ struct Viz
 
         font.loadFromFile("assets/fonts/font2.ttf");
 
+        
         beforeText.setFont(font);
         beforeText.setString("Before Minimization:");
         beforeText.setCharacterSize(48);
@@ -46,13 +51,15 @@ struct Viz
         betweenText.setString("During Minimization:");
         betweenText.setCharacterSize(48);
         betweenText.setFillColor(Color::Yellow);
-        betweenText.setPosition(20, 270);
+        betweenText.setPosition(500, 270);
 
         afterText.setFont(font);
         afterText.setString("After Minimization");
         afterText.setCharacterSize(48);
         afterText.setFillColor(Color::Yellow);
         afterText.setPosition(20, 520);
+
+        
     }
 
     void draw(bool part)
@@ -67,6 +74,7 @@ struct Viz
 
     void run()
     {
+        bool firstTime = true;
         while (window->isOpen())
         {
             Event event;
@@ -78,32 +86,72 @@ struct Viz
 
             window->draw(background);
 
+            if (firstTime)
+            {
+                window->display();
+                sleep(milliseconds(1000));
+            }
             window->draw(beforeText);
+
 
             draw_table(50, 100, initial_transition_table);
 
+            if (firstTime)
+            {
+                sleep(milliseconds(1000));
+                window->display();
+            }
             window->draw(betweenText);
+            
 
             for (int i = 0; i < intermediate_transition_tables.size(); i++)
-                draw_table(50 + i * 200, 350, intermediate_transition_tables[i]);
+                draw_table(500 + i * 400, 350, intermediate_transition_tables[i]);
 
+            if (firstTime)
+            {
+                sleep(milliseconds(3000));
+                window->display();
+            }
             window->draw(afterText);
 
-            draw_table(50, 600, final_transition_table);
-
+            draw_table(60, 600, final_transition_table);
+            if (firstTime)
+            {
+                sleep(milliseconds(2000));
+                window->display();
+            }
             window->display();
+            firstTime=false;
         }
     }
 
     void draw_table(int x, int y, vector<vector<int>> &table)
     {
+        RectangleShape rowBorder(Vector2f(table[0].size() * 50, 2));
+        for (int i = 0; i <= table.size(); i++)
+        {
+            
+            rowBorder.setPosition(x, y + i * 50);
+            rowBorder.setFillColor(Color::Black);
+            window->draw(rowBorder);
+        }
+
+       
+        for (int j = 0; j <= table[0].size(); j++)
+        {
+            RectangleShape colBorder(Vector2f(2, table.size() * 50));
+            colBorder.setPosition(x + j * 50, y);
+            colBorder.setFillColor(Color::Black);
+            window->draw(colBorder);
+        }
+
+        
         for (int i = 0; i < table.size(); i++)
         {
             for (int j = 0; j < table[i].size(); j++)
             {
                 Text tableEntry(to_string(table[i][j]), font, 24);
-                tableEntry.setPosition(50 + j * 30, 280 + i * 30);
-                tableEntry.setPosition(x + j * 30, y + i * 30);
+                tableEntry.setPosition(x + j * 50 + 5, y + i * 50 + 5);
 
                 if (j >= 2)
                     tableEntry.setColor(Color::Blue);

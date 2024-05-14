@@ -17,6 +17,7 @@ struct Menu
 
     Text selectedOption;
     bool Partitionselected = true;
+   Vector2f scaleFactors;
 
     Menu()
     {
@@ -26,6 +27,10 @@ struct Menu
         font.loadFromFile("assets/fonts/font2.ttf");
         window = new RenderWindow(VideoMode(1600, 900), "Menu");
         music.openFromFile("assets/sounds/gottrim.wav");
+        Vector2u windowSize = window->getSize();
+        scaleFactors.x = (float)windowSize.x / background.getLocalBounds().width;
+        scaleFactors.y = (float)windowSize.y / background.getLocalBounds().height;
+        background.setScale(scaleFactors);
     }
 
     void draw()
