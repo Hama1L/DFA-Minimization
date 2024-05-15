@@ -3,11 +3,12 @@
 #ifndef PART
 #define PART
 
-class Partition
+struct Partition
 {
     int inputs;
-    vector<int> final_states;
-    vector<vector<int>> transition_table;
+    vector<int> final;
+    vector<vector<int>> table;
+    vector<vector<vector<int>>> intermediate_transition_tables;
     bool is_done = false;
 
     void map_table(vector<vector<int>> &old_table, vector<vector<int>> &new_table)
@@ -44,7 +45,7 @@ class Partition
     void reduce_table(vector<vector<int>> &mappings)
     {
         for (int i = 0; i < mappings.size(); i++)
-            mappings[i][inputs + 1] = final_states[i];
+            mappings[i][inputs + 1] = final[i];
 
         vector<vector<int>> minimized;
         for (int i = 0; i < mappings.size(); i++)
@@ -53,32 +54,35 @@ class Partition
                 minimized.push_back(mappings[i]);
         }
 
-        transition_table.clear();
-        final_states.clear();
+        table.clear();
+        final.clear();
 
         for (int i = 0; i < minimized.size(); i++)
         {
             vector<int> row;
             for (int j = 0; j < inputs; j++)
                 row.push_back(minimized[i][j]);
-            transition_table.push_back(row);
-            final_states.push_back(minimized[i][inputs + 1]);
+            row.push_back(minimized[i][inputs + 1]);
+            table.push_back(row);
         }
     }
 
-public:
-    Partition(int inputs, vector<int> final, vector<vector<int>> table)
-        : inputs(inputs), final_states(final), transition_table(table) {}
+    Partition(int inputs, vector<int> final_, vector<vector<int>> table_)
+        : inputs(inputs), final(final_), table(table_)
+    {
+        for (int i = 0; i < table.size(); i++)
+            table[i].push_back(final[i]);
+    }
 
     void minimize()
     {
-        vector<vector<int>> old_table(transition_table.size(), vector<int>(inputs + 2));
+        vector<vector<int>> old_table(table.size(), vector<int>(inputs + 2));
 
-        for (int i = 0; i < transition_table.size(); i++)
+        for (int i = 0; i < table.size(); i++)
         {
             for (int j = 0; j < inputs; j++)
-                old_table[i][j] = transition_table[i][j];
-            old_table[i][inputs] = final_states[i];
+                old_table[i][j] = table[i][j];
+            old_table[i][inputs] = final[i];
             old_table[i][inputs + 1] = -1;
         }
 
@@ -87,19 +91,12 @@ public:
             vector<vector<int>> new_table = old_table;
             map_table(old_table, new_table);
             update_table(old_table, new_table);
+            intermediate_transition_tables.push_back(new_table);
         }
-
-        print_table(old_table);
 
         vector<vector<int>> mappings = old_table;
         map_table(old_table, mappings);
         reduce_table(mappings);
-    }
-
-    void printTable()
-    {
-        print_table(transition_table);
-        print_vector(final_states);
     }
 };
 
