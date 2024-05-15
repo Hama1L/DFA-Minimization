@@ -17,12 +17,13 @@ struct Menu
 
     Text selectedOption;
     bool Partitionselected = true;
-   Vector2f scaleFactors;
+    Vector2f scaleFactors;
 
     Menu()
     {
         background_image.loadFromFile("assets/images/back.jpg");
         background.setTexture(background_image);
+        background.setColor(Color(255, 255, 255, 125));
 
         font.loadFromFile("assets/fonts/font2.ttf");
         window = new RenderWindow(VideoMode(1600, 900), "Menu");

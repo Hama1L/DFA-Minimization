@@ -8,6 +8,8 @@ struct MyhillNerode
     int inputs;
     vector<int> final;
     vector<vector<int>> table;
+    vector<vector<int>> mappings;
+    vector<vector<int>> relations;
     bool is_done = false;
 
     void check_equivalent(vector<vector<int>> &map, int i, int j)
@@ -30,7 +32,9 @@ struct MyhillNerode
 
     void build_relations(vector<vector<int>> &map)
     {
-        for (int i = 1; i < table.size(); i++)
+        int n = table.size();
+
+        for (int i = 1; i < n; i++)
         {
             vector<int> row;
             for (int j = 0; j < i; j++)
@@ -96,29 +100,26 @@ struct MyhillNerode
             vector<int> row;
             for (int j = 0; j < inputs; j++)
                 row.push_back(minimized[i][j]);
+
+            row.push_back(minimized[i][inputs]);
             table.push_back(row);
-            final.push_back(minimized[i][inputs]);
         }
     }
 
-public:
-    MyhillNerode(int inputs, vector<int> final, vector<vector<int>> table)
-        : inputs(inputs), final(final), table(table) {}
+    MyhillNerode(int inputs, vector<int> final_, vector<vector<int>> table_)
+        : inputs(inputs), final(final_), table(table_)
+    {
+        for (int i = 0; i < table.size(); i++)
+            table[i].push_back(final[i]);
+    }
 
     void minimize()
     {
-        vector<vector<int>> relations;
-        vector<vector<int>> mappings;
-
         build_relations(relations);
-        build_mappings(relations, mappings);
-        reduce_table(mappings);
-    }
 
-    void printTable()
-    {
-        print_table(table);
-        print_vector(final);
+        build_mappings(relations, mappings);
+
+        reduce_table(mappings);
     }
 };
 
